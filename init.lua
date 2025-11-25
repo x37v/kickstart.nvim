@@ -1049,5 +1049,20 @@ vim.keymap.set('n', '<Up>', ':cprev<cr>', {})
 
 vim.opt.guifont = 'Hack Nerd Font:h17'
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'cpp',
+  command = 'set sw=2 ts=2 expandtab',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'typescript',
+  command = 'set sw=2 ts=2 expandtab',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'sc',
+  command = 'set sw=4 ts=4 expandtab',
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
