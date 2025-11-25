@@ -84,14 +84,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- Set <space> as the leader key
+-- Set \ as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = '\\'
+vim.g.maplocalleader = '\\'
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -964,6 +964,19 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
 
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons', -- For icons in the tree
+    },
+    config = function()
+      require('nvim-tree').setup {}
+    end,
+  },
+
+  'tpope/vim-fugitive',
+
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1011,6 +1024,26 @@ require('lazy').setup({
     },
   },
 })
+
+-- neovide settings
+vim.api.nvim_set_var('neovide_cursor_animation_length', 0.01)
+
+-- Keymap for toggling NvimTree (Leader key is 'Space' in kickstart.nvim)
+vim.keymap.set('n', '<leader>t', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>ft', ':NvimTreeFindFile<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>fT', ':NvimTreeFindFile!<CR>', { desc = 'Toggle file explorer' })
+
+--telescope
+local builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+vim.keymap.set('n', '<Down>', ':cnext<cr>', {})
+vim.keymap.set('n', '<Up>', ':cprev<cr>', {})
+
+vim.opt.guifont = 'Hack Nerd Font:h17'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
