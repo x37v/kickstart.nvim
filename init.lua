@@ -1033,16 +1033,18 @@ require('lazy').setup({
 vim.api.nvim_set_var('neovide_cursor_animation_length', 0.01)
 
 -- Keymap for toggling NvimTree (Leader key is 'Space' in kickstart.nvim)
-vim.keymap.set('n', '<leader>t', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
-vim.keymap.set('n', '<leader>ft', ':NvimTreeFindFile<CR>', { desc = 'Toggle file explorer' })
-vim.keymap.set('n', '<leader>fT', ':NvimTreeFindFile!<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>tf', ':NvimTreeFindFile<CR>', { desc = 'File explorer, find file' })
+vim.keymap.set('n', '<leader>tF', ':NvimTreeFindFile!<CR>', { desc = 'File explorer, find update root' })
 
 --telescope
+--[[
 local builtin = require 'telescope.builtin'
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+--]]
 
 vim.keymap.set('n', '<Down>', ':cnext<cr>', {})
 vim.keymap.set('n', '<Up>', ':cprev<cr>', {})
@@ -1052,6 +1054,11 @@ vim.opt.guifont = 'Hack Nerd Font:h17'
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'cpp',
   command = 'set sw=2 ts=2 expandtab',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rust',
+  command = 'set sw=4 ts=4 expandtab makeprg=cargo',
 })
 
 vim.api.nvim_create_autocmd('FileType', {
