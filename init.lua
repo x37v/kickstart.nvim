@@ -347,6 +347,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { 'gr', group = 'LSP' },
       },
     },
   },
@@ -761,6 +762,11 @@ require('lazy').setup({
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
+          -- rnbo src is not well formatted (yet), disable auto format on save
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          if bufname:match '^/Users/xnor/dev/rnbo.core/.*$' or bufname:match '^/Users/xnor/dev/max.maxcore/.*$' then
+            return nil
+          end
           return {
             timeout_ms = 500,
             lsp_format = 'fallback',
