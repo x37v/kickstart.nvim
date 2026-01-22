@@ -676,6 +676,7 @@ require('lazy').setup({
         -- gopls = {},
         -- pyright = {},
         rust_analyzer = {},
+        ts_ls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -777,6 +778,11 @@ require('lazy').setup({
         lua = { 'stylua' },
         cpp = { 'clang-format' },
         rust = { 'rustfmt', lsp_format = 'fallback' },
+        typescript = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
