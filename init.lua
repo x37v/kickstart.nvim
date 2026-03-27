@@ -84,14 +84,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- Set <space> as the leader key
+-- Set \ as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = '\\'
+vim.g.maplocalleader = '\\'
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -347,6 +347,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { 'gr', group = 'LSP' },
       },
     },
   },
@@ -671,10 +672,11 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
+        ts_ls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -756,10 +758,16 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        --local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
+          -- rnbo src is not well formatted (yet), disable auto format on save
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          if bufname:match '^/Users/xnor/dev/rnbo.core/.*$' or bufname:match '^/Users/xnor/dev/max.maxcore/.*$' then
+            return nil
+          end
           return {
             timeout_ms = 500,
             lsp_format = 'fallback',
@@ -768,6 +776,13 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        cpp = { 'clang-format' },
+        rust = { 'rustfmt', lsp_format = 'fallback' },
+        typescript = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'eslint_d', 'prettierd', 'prettier', stop_after_first = true },
+
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -964,6 +979,31 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
 
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons', -- For icons in the tree
+    },
+    config = function()
+      require('nvim-tree').setup {
+        filters = {
+          enable = true,
+          git_ignored = false,
+          dotfiles = false,
+          git_clean = false,
+          no_buffer = false,
+          no_bookmark = false,
+          custom = { '^\\.DS_Store' },
+          exclude = {},
+        },
+      }
+    end,
+  },
+
+  'tpope/vim-fugitive',
+  'jlanzarotta/bufexplorer',
+
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1011,6 +1051,61 @@ require('lazy').setup({
     },
   },
 })
+
+-- neovide settings
+vim.api.nvim_set_var('neovide_cursor_animation_length', 0.01)
+
+-- Keymap for toggling NvimTree (Leader key is 'Space' in kickstart.nvim)
+vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
+vim.keymap.set('n', '<leader>tf', ':NvimTreeFindFile<CR>', { desc = 'File explorer, find file' })
+vim.keymap.set('n', '<leader>tF', ':NvimTreeFindFile!<CR>', { desc = 'File explorer, find update root' })
+
+--telescope
+--[[
+local builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+--]]
+
+vim.keymap.set('n', '<Down>', ':cnext<cr>', {})
+vim.keymap.set('n', '<Up>', ':cprev<cr>', {})
+
+vim.opt.guifont = 'Hack Nerd Font:h17'
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'cpp',
+  command = 'set sw=2 ts=2 expandtab',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'rust',
+  command = 'set sw=4 ts=4 expandtab makeprg=cargo',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'typescript',
+  command = 'set sw=2 ts=2 expandtab',
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'sc',
+  command = 'set sw=4 ts=4 expandtab',
+})
+
+-- https://github.com/stevearc/conform.nvim/blob/master/doc/recipes.md#format-command
+vim.api.nvim_create_user_command('Format', function(args)
+  local range = nil
+  if args.count ~= -1 then
+    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    range = {
+      start = { args.line1, 0 },
+      ['end'] = { args.line2, end_line:len() },
+    }
+  end
+  require('conform').format { async = true, lsp_format = 'fallback', range = range }
+end, { range = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
